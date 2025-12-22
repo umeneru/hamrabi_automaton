@@ -12,6 +12,8 @@ export function createSim({ W = 80, H = 80 } = {}) {
 
   let gen = 0;
 
+  let lastGrowI = -1;
+
   function clearAll() {
     desired.fill(0);
     cur.fill(0);
@@ -115,6 +117,30 @@ export function createSim({ W = 80, H = 80 } = {}) {
     return -1;
   }
 
+  function findNearestRemainingDesiredCellGlobal(cx, cy) {
+    const maxR = Math.max(W, H);
+    for (let r = 0; r <= maxR; r++) {
+      const x0 = clamp(cx - r, 0, W - 1);
+      const x1 = clamp(cx + r, 0, W - 1);
+      const y0 = clamp(cy - r, 0, H - 1);
+      const y1 = clamp(cy + r, 0, H - 1);
+
+      for (let x = x0; x <= x1; x++) {
+        const t = idx(x, y0, W);
+        if (desired[t] === 1 && cur[t] === 0) return t;
+        const b = idx(x, y1, W);
+        if (desired[b] === 1 && cur[b] === 0) return b;
+      }
+      for (let y = y0; y <= y1; y++) {
+        const l = idx(x0, y, W);
+        if (desired[l] === 1 && cur[l] === 0) return l;
+        const rgt = idx(x1, y, W);
+        if (desired[rgt] === 1 && cur[rgt] === 0) return rgt;
+      }
+    }
+    return -1;
+  }
+
   function stampMotifAtCell(cx, cy) {
     // center motif at (cx,cy) but safely clip to board
     const ox = cx - (MW / 2 | 0);
@@ -134,6 +160,7 @@ export function createSim({ W = 80, H = 80 } = {}) {
     const seed = findNearestDesiredCellGlobal(cx, cy);
     if (seed !== -1) {
       cur[seed] = 1;
+      lastGrowI = seed;
       addNeighborsToFrontier(seed);
     }
   }
@@ -142,7 +169,20 @@ export function createSim({ W = 80, H = 80 } = {}) {
     pruneFrontierInPlace();
 
     const K = Math.min(Number(growthPerStep), frontier.length);
-    if (K === 0) { gen++; return; }
+    if (K === 0) {
+      // If growth is stuck but there are still desired cells remaining (e.g. an "eye"
+      // inside a completed frame), start a new seed so disconnected components can grow.
+      const cx = lastGrowI >= 0 ? (lastGrowI % W) : ((W / 2) | 0);
+      const cy = lastGrowI >= 0 ? ((lastGrowI / W) | 0) : ((H / 2) | 0);
+      const seed = findNearestRemainingDesiredCellGlobal(cx, cy);
+      if (seed !== -1) {
+        cur[seed] = 1;
+        lastGrowI = seed;
+        addNeighborsToFrontier(seed);
+      }
+      gen++;
+      return;
+    }
 
     const chosen = new Array(K);
     for (let t = 0; t < K; t++) {
@@ -154,6 +194,8 @@ export function createSim({ W = 80, H = 80 } = {}) {
       inFrontier[i] = 0;
     }
     frontier = frontier.slice(K);
+
+    lastGrowI = chosen[K - 1];
 
     for (let t = 0; t < K; t++) addNeighborsToFrontier(chosen[t]);
 

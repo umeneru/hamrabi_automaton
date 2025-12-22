@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>80x80 Click-to-Grow Motif Field</title>
+  <link rel="stylesheet" href="./assets/css/style.css" />
+</head>
+<body>
+  <main class="stage">
+    <canvas id="cv"></canvas>
+
+    <div class="hud">
+      <div class="controls">
+        <button id="btnToggle">Start</button>
+        <button id="btnStep">Step</button>
+        <button id="btnClear">Clear</button>
+        <span class="chip" id="stat">gen: 0</span>
+
+        <label>show target
+          <input id="showTarget" type="checkbox">
+        </label>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="./assets/js/app.js"></script>
+</body>
+</html>

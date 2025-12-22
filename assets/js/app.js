@@ -84,7 +84,6 @@ import { createRenderer } from "./render.js";
 
     if (!sim || sim.W !== W || sim.H !== H) {
       sim = createSim({ W, H });
-      ui.updateStat(sim.gen);
     }
   }
 
@@ -102,12 +101,10 @@ import { createRenderer } from "./render.js";
   function clearAll() {
     sim.clearAll();
     renderNow();
-    ui.updateStat(sim.gen);
   }
 
   function stepOnce() {
     sim.stepOnce(GROWTH_PER_STEP);
-    ui.updateStat(sim.gen);
     renderNow();
   }
 
@@ -154,8 +151,6 @@ import { createRenderer } from "./render.js";
       rafId = null;
     }
   });
-
-  ui.btnStep.addEventListener("click", stepOnce);
 
   ui.btnClear.addEventListener("click", () => {
     running = false;

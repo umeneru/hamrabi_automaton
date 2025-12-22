@@ -168,18 +168,29 @@ export function createSim({ W = 80, H = 80 } = {}) {
   function stepOnce(growthPerStep) {
     pruneFrontierInPlace();
 
-    const K = Math.min(Number(growthPerStep), frontier.length);
-    if (K === 0) {
-      // If growth is stuck but there are still desired cells remaining (e.g. an "eye"
-      // inside a completed frame), start a new seed so disconnected components can grow.
+    // Ensure disconnected desired components (e.g. an "eye" center pixel) can still
+    // appear even if growth never fully stalls (auto-spawn keeps frontier non-empty).
+    // When frontier is empty, seed more aggressively to avoid looking like it "stops".
+    const seedBudget = frontier.length === 0
+      ? Math.min(32, Math.max(1, Number(growthPerStep) | 0))
+      : 1;
+    for (let s = 0; s < seedBudget; s++) {
       const cx = lastGrowI >= 0 ? (lastGrowI % W) : ((W / 2) | 0);
       const cy = lastGrowI >= 0 ? ((lastGrowI / W) | 0) : ((H / 2) | 0);
       const seed = findNearestRemainingDesiredCellGlobal(cx, cy);
-      if (seed !== -1) {
-        cur[seed] = 1;
-        lastGrowI = seed;
-        addNeighborsToFrontier(seed);
-      }
+      if (seed === -1) break;
+      cur[seed] = 1;
+      lastGrowI = seed;
+      addNeighborsToFrontier(seed);
+      // If we're in the non-stalled case, keep it to one seed per step.
+      if (frontier.length !== 0 && seedBudget === 1) break;
+      // If the seeded cell was connected and frontier becomes non-empty, we can stop
+      // early in the stalled case too; growth below will take over.
+      if (frontier.length !== 0) break;
+    }
+
+    const K = Math.min(Number(growthPerStep), frontier.length);
+    if (K === 0) {
       gen++;
       return;
     }

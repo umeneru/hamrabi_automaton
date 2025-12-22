@@ -14,6 +14,9 @@ import { createRenderer } from "./render.js";
   let rafId = null;
   let lastT = 0;
 
+  const AUTO_SPAWN_MS = 1200;
+  let lastSpawnT = 0;
+
   const MAX_CELLS = 120_000;
   const TARGET_CELL_PX = 10;
 
@@ -109,9 +112,21 @@ import { createRenderer } from "./render.js";
     renderNow();
   }
 
+  function spawnRandomMotif() {
+    const x = (Math.random() * sim.W) | 0;
+    const y = (Math.random() * sim.H) | 0;
+    sim.stampMotifAtCell(x, y);
+  }
+
   function loop(t) {
     if (!running) return;
     const interval = 1000 / FPS;
+
+    if (ui.autoMode?.checked && (t - lastSpawnT >= AUTO_SPAWN_MS)) {
+      lastSpawnT = t;
+      spawnRandomMotif();
+      renderNow();
+    }
 
     if (t - lastT >= interval) {
       lastT = t;
@@ -133,6 +148,7 @@ import { createRenderer } from "./render.js";
     ui.btnToggle.textContent = running ? "Stop" : "Start";
     if (running) {
       lastT = performance.now();
+      lastSpawnT = lastT;
       rafId = requestAnimationFrame(loop);
     } else if (rafId) {
       cancelAnimationFrame(rafId);
@@ -147,6 +163,7 @@ import { createRenderer } from "./render.js";
     ui.btnToggle.textContent = "Start";
     if (rafId) cancelAnimationFrame(rafId);
     rafId = null;
+    lastSpawnT = 0;
     clearAll();
   });
 

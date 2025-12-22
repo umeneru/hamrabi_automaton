@@ -7,6 +7,7 @@ export function bindUI() {
 
   const stat = document.getElementById("stat");
 
+  const autoMode = document.getElementById("autoMode");
   const showTarget = document.getElementById("showTarget");
 
   function updateStat(gen) {
@@ -16,6 +17,7 @@ export function bindUI() {
   return {
     cv,
     btnToggle, btnStep, btnClear,
+    autoMode,
     showTarget,
     updateStat,
   };

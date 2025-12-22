@@ -9,7 +9,7 @@ export function createRenderer({ cv, pad = 18 }) {
     return Math.max(1, Math.floor(Math.min(usableW / W, usableH / H)));
   }
 
-  function render({ W, H, desired, cur, showTarget }) {
+  function render({ W, H, desired, cur }) {
     const cs = cellSize(W, H);
     const gridW = cs * W;
     const gridH = cs * H;
@@ -32,10 +32,6 @@ export function createRenderer({ cv, pad = 18 }) {
         ctx.fillRect(px, py, cs, cs);
       }
 
-      if (showTarget && desired[i] === 1 && cur[i] === 0) {
-        ctx.fillStyle = "rgba(230,237,243,0.10)";
-        ctx.fillRect(px, py, cs, cs);
-      }
     }
   }
 

@@ -8,7 +8,6 @@ export function bindUI() {
   const stat = document.getElementById("stat");
 
   const autoMode = document.getElementById("autoMode");
-  const showTarget = document.getElementById("showTarget");
 
   function updateStat(gen) {
     stat.textContent = `gen: ${gen}`;
@@ -18,7 +17,6 @@ export function bindUI() {
     cv,
     btnToggle, btnStep, btnClear,
     autoMode,
-    showTarget,
     updateStat,
   };
 }

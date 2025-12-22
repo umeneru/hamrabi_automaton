@@ -10,7 +10,7 @@ import { createRenderer } from "./render.js";
   const FPS = 20;
   const GROWTH_PER_STEP = 60;
 
-  let running = false;
+  let running = true;
   let rafId = null;
   let lastT = 0;
 
@@ -96,7 +96,6 @@ import { createRenderer } from "./render.js";
       H: sim.H,
       desired: sim.desired,
       cur: sim.cur,
-      showTarget: ui.showTarget.checked,
     });
   }
 
@@ -167,10 +166,13 @@ import { createRenderer } from "./render.js";
     clearAll();
   });
 
-  ui.showTarget.addEventListener("change", renderNow);
-
   // init
   window.addEventListener("resize", renderNow, { passive: true });
   renderNow();
   clearAll();
+
+  ui.btnToggle.textContent = "Stop";
+  lastT = performance.now();
+  lastSpawnT = lastT;
+  rafId = requestAnimationFrame(loop);
 })();

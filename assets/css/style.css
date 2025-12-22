@@ -7,6 +7,8 @@ button {
   cursor:pointer; font-weight:600;
 }
 button:hover { background:#0f172a; }
+.toggle[aria-pressed="true"] { background:#0f172a; }
+.toggle[aria-pressed="false"] { opacity:.85; }
 .chip { border:1px solid #243244; border-radius:999px; padding:6px 10px; background:#0f172a; font-size:12px; opacity:.95; }
 label { font-size: 12px; opacity:.9; display:flex; gap:8px; align-items:center; }
 input[type="range"] { width: 160px; }

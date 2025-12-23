@@ -153,11 +153,7 @@ import { createRenderer } from "./render.js";
   });
 
   ui.btnClear.addEventListener("click", () => {
-    running = false;
-    ui.btnToggle.textContent = "Start";
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = null;
-    lastSpawnT = 0;
+    lastSpawnT = performance.now();
     clearAll();
   });
 
